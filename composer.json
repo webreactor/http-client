@@ -1,0 +1,10 @@
+{
+   "name": "webreactor/http-client",
+    "description": "HTTP Client",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Reactor\\HttpClient\\": "src/"
+        }
+    }
+}
