@@ -130,7 +130,7 @@ class HttpClient {
         $at = 'at '.$curl_options[CURLOPT_CUSTOMREQUEST].' '.$curl_options[CURLOPT_URL];
 
         if (empty($http_code)) {
-            $info['generic_code_message'] = curl_error($_curl).", transport level error ($http_code) $at";
+            $info['generic_code_message'] = curl_error($_curl).", error $at";
             $info['generic_code'] = '0xx';
         }
 
