@@ -87,16 +87,17 @@ class HttpClient {
         }
 
         // Curl call routine
-        $ch = curl_init();
-        curl_setopt_array($ch, $curl_options);
-        $raw_response = curl_exec($ch);
-        $info = curl_getinfo($ch);
-        curl_close($ch);
+        $_curl = curl_init();
+        curl_setopt_array($_curl, $curl_options);
+        $raw_response = curl_exec($_curl);
 
-        return $this->prepareReturn($curl_options, $info, $raw_response);
+        $ret = $this->prepareReturn($_curl, $curl_options, $raw_response);
+        curl_close($_curl);
+        return $ret;
     }
 
-    protected function prepareReturn($curl_options, $info, $raw_response) {
+    protected function prepareReturn($_curl, $curl_options, $raw_response) {
+        $info = curl_getinfo($_curl);
         $response_header = $response_body = '';
         $request_header = $request_body = '';
 
@@ -115,7 +116,7 @@ class HttpClient {
 
         return array(
             'curl_options' => $curl_options,
-            'info' => $this->addSummary($info, $curl_options),
+            'info' => $this->addSummary($_curl, $curl_options, $info),
             'response_header' => $response_header,
             'response_body' => $response_body,
             'request_header' => $request_header,
@@ -123,12 +124,15 @@ class HttpClient {
         );
     }
 
-    protected function addSummary($info, $curl_options) {
+    protected function addSummary($_curl, $curl_options, $info) {
+        
         $http_code = $info['http_code'];
         $at = 'at '.$curl_options[CURLOPT_CUSTOMREQUEST].' '.$curl_options[CURLOPT_URL];
 
-        $info['generic_code_message'] = "Not able establish a connection, transport level error ($http_code) $at";
-        $info['generic_code'] = '0xx';
+        if (empty($http_code)) {
+            $info['generic_code_message'] = curl_error($_curl).", transport level error ($http_code) $at";
+            $info['generic_code'] = '0xx';
+        }
 
         if ($http_code >= 100 && $http_code < 200) {
             $info['generic_code_message'] = "Info message ($http_code) $at";
