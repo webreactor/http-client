@@ -1,8 +1,6 @@
 
 ### HTTP Client
 
-*Because we dont like Guzzle*
-
 ## Main features
 
 * It is just a wrapper for CURL
