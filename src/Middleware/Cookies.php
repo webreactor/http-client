@@ -20,7 +20,7 @@ class Cookies extends BaseMiddleware
                 $cookie['value'],
                 strtotime($cookie['expires']),
                 $cookie['path'],
-                $cookie['domain'],
+                '', // $cookie['domain'],
                 $cookie['secure'],
                 $cookie['httponly']
             );
