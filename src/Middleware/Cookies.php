@@ -4,9 +4,21 @@ namespace Reactor\HttpClient\Middleware;
 
 class Cookies extends BaseMiddleware
 {
+    const SESSION_KEY_FOR_COOKIES = 'reactor_http_client';
+
+    public function __construct() {
+        session_start();
+    }
+
     public function action($request)
     {
-        $request[CURLOPT_COOKIE] = http_build_query($_COOKIE, '', ';');
+        $sessionKey4RequestUrl = $this->getSessionKey4RequestUrl($request[CURLOPT_URL]);
+
+        if (isset($_SESSION[self::SESSION_KEY_FOR_COOKIES][$sessionKey4RequestUrl])) {
+            $request[CURLOPT_COOKIE] = $this->buildCookies4CurlOpt(
+                $_SESSION[self::SESSION_KEY_FOR_COOKIES][$sessionKey4RequestUrl]
+            );
+        }
 
         $response = parent::action($request);
 
@@ -15,15 +27,7 @@ class Cookies extends BaseMiddleware
         );
 
         foreach ($extractedCookies as $cookie) {
-            setcookie(
-                $cookie['name'],
-                $cookie['value'],
-                strtotime($cookie['expires']),
-                $cookie['path'],
-                '', // $cookie['domain'],
-                $cookie['secure'],
-                $cookie['httponly']
-            );
+            $_SESSION[self::SESSION_KEY_FOR_COOKIES][$sessionKey4RequestUrl][$cookie['name']] = $cookie['value'];
         }
 
         return $response;
@@ -68,6 +72,19 @@ class Cookies extends BaseMiddleware
         }
 
         return $extractedCookies;
+    }
+
+    protected function getSessionKey4RequestUrl(string $requestUrl): string {
+        $parsedRequestUrl = parse_url($requestUrl);
+        return sprintf(
+            '%s:%s',
+            $parsedRequestUrl['host'],
+            $parsedRequestUrl['port']
+        );
+    }
+
+    protected function buildCookies4CurlOpt(array $cookies) {
+        return http_build_query($cookies, '', ';');
     }
 
     protected function getDefaultCookieAttributesValue(): array {
