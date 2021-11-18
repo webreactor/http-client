@@ -6,18 +6,18 @@ class Cookies extends BaseMiddleware
 {
     const SESSION_KEY_FOR_COOKIES = 'reactor_http_client';
 
-    public function __construct() {
-        session_start();
+    private $cookies;
+
+    public function __construct(\ArrayObject $cookies) {
+        $this->cookies = $cookies;
     }
 
     public function action($request)
     {
         $sessionKey4RequestUrl = $this->getSessionKey4RequestUrl($request[CURLOPT_URL]);
 
-        if (isset($_SESSION[self::SESSION_KEY_FOR_COOKIES][$sessionKey4RequestUrl])) {
-            $request[CURLOPT_COOKIE] = $this->buildCookies4CurlOpt(
-                $_SESSION[self::SESSION_KEY_FOR_COOKIES][$sessionKey4RequestUrl]
-            );
+        if ($this->cookies->count() > 0) {
+            $request[CURLOPT_COOKIE] = $this->buildCookies4CurlOpt($this->cookies->getArrayCopy());
         }
 
         $response = parent::action($request);
@@ -27,7 +27,7 @@ class Cookies extends BaseMiddleware
         );
 
         foreach ($extractedCookies as $cookie) {
-            $_SESSION[self::SESSION_KEY_FOR_COOKIES][$sessionKey4RequestUrl][$cookie['name']] = $cookie['value'];
+            $this->cookies[$cookie['name']] = $cookie['value'];
         }
 
         return $response;
