@@ -2,8 +2,8 @@
 
 namespace Reactor\HttpClient\Middleware;
 
-class BasicAuth extends BaseMiddleware
-{
+class BasicAuth extends BaseMiddleware {
+
     private $login;
     private $password;
 
@@ -11,14 +11,12 @@ class BasicAuth extends BaseMiddleware
      * @param  string  $login
      * @param  string  $password
      */
-    public function __construct($login, $password)
-    {
+    public function __construct($login, $password) {
         $this->login = $login;
         $this->password = $password;
     }
 
-    public function action($request)
-    {
+    public function action($request) {
         $request[CURLOPT_USERPWD] = sprintf(
             '%s:%s',
             $this->login,
@@ -27,4 +25,5 @@ class BasicAuth extends BaseMiddleware
 
         return parent::action($request);
     }
+
 }
