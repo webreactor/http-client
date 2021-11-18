@@ -2,8 +2,8 @@
 
 namespace Reactor\HttpClient\Middleware;
 
-class Cookies extends BaseMiddleware
-{
+class Cookies extends BaseMiddleware {
+
     private $cookies;
 
     /**
@@ -108,4 +108,5 @@ class Cookies extends BaseMiddleware
             'httponly' => false
         ];
     }
+
 }
