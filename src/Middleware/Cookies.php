@@ -13,8 +13,7 @@ class Cookies extends BaseMiddleware
         $this->cookies = $cookies;
     }
 
-    public function action($request)
-    {
+    public function action($request) {
         $sessionKey4RequestUrl = $this->getSessionKey4RequestUrl($request[CURLOPT_URL]);
 
         if ($this->cookies->count() > 0) {
@@ -38,13 +37,11 @@ class Cookies extends BaseMiddleware
      * @param  string  $responseHeaders
      * @return array
      */
-    protected function extractResponseHeaderCookies($responseHeaders)
-    {
+    protected function extractResponseHeaderCookies($responseHeaders) {
         $extractedCookies = [];
         preg_match_all('#^set-Cookie:\s*(.*)$#mi', $responseHeaders, $matchesCookieLines);
 
-        foreach ($matchesCookieLines[1] as $matchCookieLine)
-        {
+        foreach ($matchesCookieLines[1] as $matchCookieLine) {
             $pieces = array_filter(
                 array_map(
                     'trim',
@@ -53,8 +50,7 @@ class Cookies extends BaseMiddleware
             );
 
             $cookieAttributesValue = $this->getDefaultCookieAttributesValue();
-            foreach ($pieces as $part)
-            {
+            foreach ($pieces as $part) {
                 [$key, $value] = explode('=', $part, 2);
 
                 $key = trim($key);
