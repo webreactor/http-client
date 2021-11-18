@@ -4,11 +4,12 @@ namespace Reactor\HttpClient\Middleware;
 
 class Cookies extends BaseMiddleware
 {
-    const SESSION_KEY_FOR_COOKIES = 'reactor_http_client';
-
     private $cookies;
 
-    public function __construct(\ArrayObject $cookies) {
+    /**
+     * @param  \ArrayObject  $cookies
+     */
+    public function __construct($cookies) {
         $this->cookies = $cookies;
     }
 
@@ -33,7 +34,11 @@ class Cookies extends BaseMiddleware
         return $response;
     }
 
-    protected function extractResponseHeaderCookies(string $responseHeaders): array
+    /**
+     * @param  string  $responseHeaders
+     * @return array
+     */
+    protected function extractResponseHeaderCookies($responseHeaders)
     {
         $extractedCookies = [];
         preg_match_all('#^set-Cookie:\s*(.*)$#mi', $responseHeaders, $matchesCookieLines);
@@ -74,7 +79,11 @@ class Cookies extends BaseMiddleware
         return $extractedCookies;
     }
 
-    protected function getSessionKey4RequestUrl(string $requestUrl): string {
+    /**
+     * @param  string  $requestUrl
+     * @return string
+     */
+    protected function getSessionKey4RequestUrl($requestUrl) {
         $parsedRequestUrl = parse_url($requestUrl);
         return sprintf(
             '%s:%s',
@@ -83,11 +92,15 @@ class Cookies extends BaseMiddleware
         );
     }
 
-    protected function buildCookies4CurlOpt(array $cookies) {
+    /**
+     * @param  array  $cookies
+     * @return string
+     */
+    protected function buildCookies4CurlOpt($cookies) {
         return http_build_query($cookies, '', ';');
     }
 
-    protected function getDefaultCookieAttributesValue(): array {
+    protected function getDefaultCookieAttributesValue() {
         return [
             'name' => null,
             'value' => '',
