@@ -14,10 +14,15 @@ class Cookies extends BaseMiddleware {
     }
 
     public function action($request) {
-        $sessionKey4RequestUrl = $this->getSessionKey4RequestUrl($request[CURLOPT_URL]);
+        $sessionKey = $this->getSessionKey4RequestUrl($request[CURLOPT_URL]);
 
-        if ($this->cookies->count() > 0) {
-            $request[CURLOPT_COOKIE] = $this->buildCookies4CurlOpt($this->cookies->getArrayCopy());
+        if (
+            isset($this->cookies[$sessionKey]) &&
+            !empty($this->cookies[$sessionKey])
+        ) {
+            $request[CURLOPT_COOKIE] = $this->buildCookies4CurlOpt(
+                $this->cookies[$sessionKey]
+            );
         }
 
         $response = parent::action($request);
@@ -27,7 +32,7 @@ class Cookies extends BaseMiddleware {
         );
 
         foreach ($extractedCookies as $cookie) {
-            $this->cookies[$cookie['name']] = $cookie['value'];
+            $this->cookies[$sessionKey][$cookie['name']] = $cookie['value'];
         }
 
         return $response;
@@ -39,7 +44,7 @@ class Cookies extends BaseMiddleware {
      */
     protected function extractResponseHeaderCookies($responseHeaders) {
         $extractedCookies = [];
-        preg_match_all('#^set-Cookie:\s*(.*)$#mi', $responseHeaders, $matchesCookieLines);
+        preg_match_all('#^Set-Cookie:\s*(.*)$#mi', $responseHeaders, $matchesCookieLines);
 
         foreach ($matchesCookieLines[1] as $matchCookieLine) {
             $pieces = array_filter(
