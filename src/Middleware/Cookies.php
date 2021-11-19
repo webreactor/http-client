@@ -14,8 +14,6 @@ class Cookies extends BaseMiddleware {
     }
 
     public function action($request) {
-        $sessionKey4RequestUrl = $this->getSessionKey4RequestUrl($request[CURLOPT_URL]);
-
         if ($this->cookies->count() > 0) {
             $request[CURLOPT_COOKIE] = $this->buildCookies4CurlOpt($this->cookies->getArrayCopy());
         }
@@ -73,19 +71,6 @@ class Cookies extends BaseMiddleware {
         }
 
         return $extractedCookies;
-    }
-
-    /**
-     * @param  string  $requestUrl
-     * @return string
-     */
-    protected function getSessionKey4RequestUrl($requestUrl) {
-        $parsedRequestUrl = parse_url($requestUrl);
-        return sprintf(
-            '%s:%s',
-            $parsedRequestUrl['host'],
-            $parsedRequestUrl['port']
-        );
     }
 
     /**
