@@ -18,7 +18,7 @@ class HttpClient {
 
     public function __construct($base_url = '', $curl_defaults = array()) {
         $this->base_url = $base_url;
-        $this->curl_defaults += $curl_defaults;
+        $this->curl_defaults = $curl_defaults + $this->curl_defaults;
         $this->middleware = array($this, 'callCurl');
     }
 
@@ -64,7 +64,7 @@ class HttpClient {
             }
         }
 
-        $curl_options = $this->curl_defaults + $curl_options +
+        $curl_options = $curl_options + $this->curl_defaults +
             array(
                 CURLOPT_URL => $this->base_url.$url,
                 CURLOPT_HTTPHEADER => $headers,
@@ -101,7 +101,7 @@ class HttpClient {
         $response_header = $response_body = '';
         $request_header = $request_body = '';
 
-        if (isset($info['header_size'])) {
+        if (is_string($raw_response) && isset($info['header_size'])) {
             $response_header = substr($raw_response, 0, $info['header_size']);
             $response_body = substr($raw_response, $info['header_size']);
         }
