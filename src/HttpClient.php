@@ -101,7 +101,7 @@ class HttpClient {
         $response_header = $response_body = '';
         $request_header = $request_body = '';
 
-        if (isset($info['header_size'])) {
+        if (is_string($raw_response) && isset($info['header_size'])) {
             $response_header = substr($raw_response, 0, $info['header_size']);
             $response_body = substr($raw_response, $info['header_size']);
         }
